@@ -62,7 +62,7 @@ export default function App() {
 
   return (
     <>
-      <nav className="nav-bar">
+      <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
         <div className="logo">
           <span role="img">🍿</span>
           <h1>usePopcorn</h1>
