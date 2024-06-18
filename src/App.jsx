@@ -149,15 +149,15 @@ export default function App() {
                 {watched.map(movie => (
                   <li
                     key={movie.imdbID}
-                    className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto auto] text-[1.6rem] bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
+                    className="relative grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] text-[1.6rem]  bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
                   >
                     <img
                       src={movie.Poster}
                       alt={`${movie.Title} poster`}
-                      className="w-full h-auto grid-row-1 col-span-1 row-span-full"
+                      className="w-full h-full row-start-1 row-span-full"
                     />
-                    <h3 className="grid-row-2 col-span-1">{movie.Title}</h3>
-                    <div className="grid grid-cols-2 grid-rows-1 gap-x-[1rem] grid-row-3 col-span-full">
+                    <h3 className="grid-row-2 col-span-1 text-3xl">{movie.Title}</h3>
+                    <div className="flex gap-8">
                       <p className="flex items-center gap-[0.8rem]">
                         <span>⭐️</span>
                         <span>{movie.imdbRating}</span>
