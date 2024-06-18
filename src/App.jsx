@@ -79,7 +79,7 @@ export default function App() {
         </p>
       </nav>
 
-      <main className="main">
+      <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
         <div className="box">
           <button
             className="btn-toggle"
