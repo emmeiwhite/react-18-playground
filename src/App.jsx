@@ -50,21 +50,22 @@ const tempWatchedData = [
 const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData)
   return (
     <>
-      <Navigation />
+      <Navigation movies={movies} />
       <Main />
     </>
   )
 }
 
 // Structural Component
-function Navigation() {
+function Navigation({ movies }) {
   return (
     <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
       <Logo />
-
-      <NumResults />
+      <Search />
+      <NumResults movies={movies} />
     </nav>
   )
 }
@@ -94,10 +95,10 @@ function Search() {
 }
 
 // Structural Component
-function NumResults() {
+function NumResults({ movies }) {
   return (
     <p className="justify-self-end text-[1.8rem]">
-      Found <strong>{'X'}</strong> results
+      Found <strong>{movies.length}</strong> results
     </p>
   )
 }
@@ -130,8 +131,7 @@ function MoviesList() {
   )
 }
 
-function Movies() {
-  const [movies, setMovies] = useState(tempMovieData)
+function Movies({ movies }) {
   return (
     <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
       {movies?.map(movie => (
