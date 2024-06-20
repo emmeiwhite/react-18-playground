@@ -58,29 +58,51 @@ export default function App() {
   )
 }
 
+// Structural Component
 function Navigation() {
-  const [query, setQuery] = useState('')
   return (
     <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
-      <div className="flex items-center gap-[0.8rem] text-3xl sm:text-4xl">
-        <span role="img">🍿</span>
-        <h1>usePopcorn</h1>
-      </div>
-      <input
-        className="justify-self-center border-none px-[1.6rem] py-[1.1rem] text-[1.8rem] rounded-[0.7rem] w-[40rem] transition-all duration-300 text-custom-text bg-primary-light placeholder-custom-text-dark focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:transform focus:-translate-y-0.5"
-        type="text"
-        placeholder="Search movies..."
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-      />
+      <Logo />
 
-      <p className="justify-self-end text-[1.8rem]">
-        Found <strong>{'X'}</strong> results
-      </p>
+      <NumResults />
     </nav>
   )
 }
 
+// Structural Component | For Layours
+function Logo() {
+  return (
+    <div className="flex items-center gap-[0.8rem] text-3xl sm:text-4xl">
+      <span role="img">🍿</span>
+      <h1>usePopcorn</h1>
+    </div>
+  )
+}
+
+// Stateful Component
+function Search() {
+  const [query, setQuery] = useState('')
+  return (
+    <input
+      className="justify-self-center border-none px-[1.6rem] py-[1.1rem] text-[1.8rem] rounded-[0.7rem] w-[40rem] transition-all duration-300 text-custom-text bg-primary-light placeholder-custom-text-dark focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:transform focus:-translate-y-0.5"
+      type="text"
+      placeholder="Search movies..."
+      value={query}
+      onChange={e => setQuery(e.target.value)}
+    />
+  )
+}
+
+// Structural Component
+function NumResults() {
+  return (
+    <p className="justify-self-end text-[1.8rem]">
+      Found <strong>{'X'}</strong> results
+    </p>
+  )
+}
+
+// Main Structural Component
 function Main() {
   return (
     <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
@@ -122,6 +144,7 @@ function Movies() {
   )
 }
 
+// Stateless Presentational component
 function Movie({ movie }) {
   return (
     <li
@@ -167,6 +190,7 @@ function MoviesWatched() {
   )
 }
 
+// Stateless presentational component | We are using derived state here
 function WatchedSummary({ watched }) {
   const avgImdbRating = average(watched.map(movie => movie.imdbRating))
   const avgUserRating = average(watched.map(movie => movie.userRating))
@@ -196,16 +220,21 @@ function WatchedSummary({ watched }) {
   )
 }
 
+// Presentational Component
 function WatchedList({ watched }) {
   return (
     <ul className="list py-[0.8rem] px-0 list-none">
       {watched.map(movie => (
-        <WatchedMovie movie={movie} />
+        <WatchedMovie
+          movie={movie}
+          key={movie.imdbID}
+        />
       ))}
     </ul>
   )
 }
 
+// Presentational Component | Stateless
 function WatchedMovie({ movie }) {
   return (
     <li
