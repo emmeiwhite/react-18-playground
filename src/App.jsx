@@ -2,6 +2,7 @@ import { Children, useState } from 'react'
 import Modal from './components/Modal'
 import Success from './components/Success'
 import Failure from './components/Failure'
+import StarRating from './components/StarRating'
 
 const tempMovieData = [
   {
@@ -57,16 +58,19 @@ export default function App() {
   return (
     <>
       {/* <Navigation movies={movies} /> */}
-
-      {/* <Navigation>
+      {/* 
+      <Navigation>
         <NumResults movies={movies} />
       </Navigation>
+
       <Main movies={movies} /> */}
 
-      <Modal>
-        {/* <Success /> */}
+      {/* <Modal>
+        <Success />
         <Failure />
-      </Modal>
+      </Modal> */}
+
+      <StarRating />
     </>
   )
 }
