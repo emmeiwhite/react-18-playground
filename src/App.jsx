@@ -50,134 +50,156 @@ const tempWatchedData = [
 const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
 export default function App() {
-  const [query, setQuery] = useState('')
   const [movies, setMovies] = useState(tempMovieData)
-  const [watched, setWatched] = useState(tempWatchedData)
+
+  return (
+    <>
+      <Navigation movies={movies} />
+      <Main movies={movies} />
+    </>
+  )
+}
+
+function Navigation({ movies }) {
+  const [query, setQuery] = useState('')
+  return (
+    <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
+      <div className="flex items-center gap-[0.8rem] text-3xl sm:text-4xl">
+        <span role="img">🍿</span>
+        <h1>usePopcorn</h1>
+      </div>
+      <input
+        className="justify-self-center border-none px-[1.6rem] py-[1.1rem] text-[1.8rem] rounded-[0.7rem] w-[40rem] transition-all duration-300 text-custom-text bg-primary-light placeholder-custom-text-dark focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:transform focus:-translate-y-0.5"
+        type="text"
+        placeholder="Search movies..."
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+      />
+
+      <p className="justify-self-end text-[1.8rem]">
+        Found <strong>{movies.length}</strong> results
+      </p>
+    </nav>
+  )
+}
+
+function Main({ movies }) {
+  return (
+    <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
+      <MoviesList movies={movies} />
+      <MoviesWatched />
+    </main>
+  )
+}
+
+function MoviesList({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true)
+  return (
+    <div className="w-[42rem] max-w-[42rem] bg-custom-background-500 rounded-[0.9rem] relative overflow-y-auto">
+      <button
+        className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-text text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-900"
+        onClick={() => setIsOpen1(open => !open)}
+      >
+        {isOpen1 ? '–' : '+'}
+      </button>
+
+      {isOpen1 && (
+        <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
+          {movies?.map(movie => (
+            <li
+              key={movie.imdbID}
+              className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
+            >
+              <img
+                src={movie.Poster}
+                alt={`${movie.Title} poster`}
+                className="w-full h-auto grid-row-1 col-span-1 row-span-3"
+              />
+              <div className="grid col-span-1  ">
+                <h3 className="text-[1.8rem]">{movie.Title}</h3>
+                <div className="flex items-center gap-[0.8rem]">
+                  <span>🗓</span>
+                  <span>{movie.Year}</span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function MoviesWatched() {
   const [isOpen2, setIsOpen2] = useState(true)
+  const [watched, setWatched] = useState(tempWatchedData)
 
   const avgImdbRating = average(watched.map(movie => movie.imdbRating))
   const avgUserRating = average(watched.map(movie => movie.userRating))
   const avgRuntime = average(watched.map(movie => movie.runtime))
-
   return (
-    <>
-      <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
-        <div className="flex items-center gap-[0.8rem] text-3xl sm:text-4xl">
-          <span role="img">🍿</span>
-          <h1>usePopcorn</h1>
-        </div>
-        <input
-          className="justify-self-center border-none px-[1.6rem] py-[1.1rem] text-[1.8rem] rounded-[0.7rem] w-[40rem] transition-all duration-300 text-custom-text bg-primary-light placeholder-custom-text-dark focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:transform focus:-translate-y-0.5"
-          type="text"
-          placeholder="Search movies..."
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
+    <div className="w-[42rem] max-w-[42rem] bg-custom-background-500 rounded-[0.9rem] relative overflow-y-auto">
+      <button
+        className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-text text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-900"
+        onClick={() => setIsOpen2(open => !open)}
+      >
+        {isOpen2 ? '–' : '+'}
+      </button>
+      {isOpen2 && (
+        <>
+          <div className="bg-custom-background-100 rounded-[0.9rem] shadow-md p-[2.2rem_3.2rem_1.8rem_3.2rem]">
+            <h2 className="uppercase text-[1.6rem] mb-[0.6rem]">Movies you watched</h2>
+            <div className="flex items-center gap-[2.4rem] text-[1.6rem] font-semibold">
+              <p className="flex items-center gap-[0.8rem]">
+                <span>#️⃣</span>
+                <span>{watched.length} movies</span>
+              </p>
+              <p className="flex items-center gap-[0.8rem]">
+                <span>⭐️</span>
+                <span>{avgImdbRating}</span>
+              </p>
+              <p className="flex items-center gap-[0.8rem]">
+                <span>🌟</span>
+                <span>{avgUserRating}</span>
+              </p>
+              <p className="flex items-center gap-[0.8rem]">
+                <span>⏳</span>
+                <span>{avgRuntime} min</span>
+              </p>
+            </div>
+          </div>
 
-        <p className="justify-self-end text-[1.8rem]">
-          Found <strong>{movies.length}</strong> results
-        </p>
-      </nav>
-
-      <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
-        <div className="w-[42rem] max-w-[42rem] bg-custom-background-500 rounded-[0.9rem] relative overflow-scroll">
-          <button
-            className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-text text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-900"
-            onClick={() => setIsOpen1(open => !open)}
-          >
-            {isOpen1 ? '–' : '+'}
-          </button>
-
-          {isOpen1 && (
-            <ul className="py-[0.8rem] px-0 list-none overflow-scroll">
-              {movies?.map(movie => (
-                <li
-                  key={movie.imdbID}
-                  className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
-                >
-                  <img
-                    src={movie.Poster}
-                    alt={`${movie.Title} poster`}
-                    className="w-full h-auto grid-row-1 col-span-1 row-span-3"
-                  />
-                  <div className="grid col-span-1  ">
-                    <h3 className="text-[1.8rem]">{movie.Title}</h3>
-                    <div className="flex items-center gap-[0.8rem]">
-                      <span>🗓</span>
-                      <span>{movie.Year}</span>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="w-[42rem] max-w-[42rem] bg-custom-background-500 rounded-[0.9rem] relative overflow-scroll">
-          <button
-            className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-text text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-900"
-            onClick={() => setIsOpen2(open => !open)}
-          >
-            {isOpen2 ? '–' : '+'}
-          </button>
-          {isOpen2 && (
-            <>
-              <div className="bg-custom-background-100 rounded-[0.9rem] shadow-md p-[2.2rem_3.2rem_1.8rem_3.2rem]">
-                <h2 className="uppercase text-[1.6rem] mb-[0.6rem]">Movies you watched</h2>
-                <div className="flex items-center gap-[2.4rem] text-[1.6rem] font-semibold">
-                  <p className="flex items-center gap-[0.8rem]">
-                    <span>#️⃣</span>
-                    <span>{watched.length} movies</span>
-                  </p>
+          <ul className="list py-[0.8rem] px-0 list-none">
+            {watched.map(movie => (
+              <li
+                key={movie.imdbID}
+                className="relative grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] text-[1.6rem]  bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
+              >
+                <img
+                  src={movie.Poster}
+                  alt={`${movie.Title} poster`}
+                  className="w-full h-full row-start-1 row-span-full"
+                />
+                <h3 className="grid-row-2 col-span-1 text-3xl">{movie.Title}</h3>
+                <div className="flex gap-8">
                   <p className="flex items-center gap-[0.8rem]">
                     <span>⭐️</span>
-                    <span>{avgImdbRating}</span>
+                    <span>{movie.imdbRating}</span>
                   </p>
                   <p className="flex items-center gap-[0.8rem]">
                     <span>🌟</span>
-                    <span>{avgUserRating}</span>
+                    <span>{movie.userRating}</span>
                   </p>
                   <p className="flex items-center gap-[0.8rem]">
                     <span>⏳</span>
-                    <span>{avgRuntime} min</span>
+                    <span>{movie.runtime} min</span>
                   </p>
                 </div>
-              </div>
-
-              <ul className="list py-[0.8rem] px-0 list-none">
-                {watched.map(movie => (
-                  <li
-                    key={movie.imdbID}
-                    className="relative grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] text-[1.6rem]  bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
-                  >
-                    <img
-                      src={movie.Poster}
-                      alt={`${movie.Title} poster`}
-                      className="w-full h-full row-start-1 row-span-full"
-                    />
-                    <h3 className="grid-row-2 col-span-1 text-3xl">{movie.Title}</h3>
-                    <div className="flex gap-8">
-                      <p className="flex items-center gap-[0.8rem]">
-                        <span>⭐️</span>
-                        <span>{movie.imdbRating}</span>
-                      </p>
-                      <p className="flex items-center gap-[0.8rem]">
-                        <span>🌟</span>
-                        <span>{movie.userRating}</span>
-                      </p>
-                      <p className="flex items-center gap-[0.8rem]">
-                        <span>⏳</span>
-                        <span>{movie.runtime} min</span>
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      </main>
-    </>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
   )
 }
