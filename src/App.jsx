@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Children, useState } from 'react'
 
 const tempMovieData = [
   {
@@ -53,19 +53,24 @@ export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
   return (
     <>
-      <Navigation movies={movies} />
+      {/* <Navigation movies={movies} /> */}
+
+      <Navigation>
+        <NumResults movies={movies} />
+      </Navigation>
       <Main movies={movies} />
     </>
   )
 }
 
 // Structural Component
-function Navigation({ movies }) {
+function Navigation({ children }) {
   return (
     <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
       <Logo />
       <Search />
-      <NumResults movies={movies} />
+      {/* <NumResults movies={movies} /> */}
+      {children}
     </nav>
   )
 }
