@@ -50,17 +50,15 @@ const tempWatchedData = [
 const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData)
-
   return (
     <>
-      <Navigation movies={movies} />
-      <Main movies={movies} />
+      <Navigation />
+      <Main />
     </>
   )
 }
 
-function Navigation({ movies }) {
+function Navigation() {
   const [query, setQuery] = useState('')
   return (
     <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
@@ -77,23 +75,25 @@ function Navigation({ movies }) {
       />
 
       <p className="justify-self-end text-[1.8rem]">
-        Found <strong>{movies.length}</strong> results
+        Found <strong>{'X'}</strong> results
       </p>
     </nav>
   )
 }
 
-function Main({ movies }) {
+function Main() {
   return (
     <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
-      <MoviesList movies={movies} />
+      <MoviesList />
       <MoviesWatched />
     </main>
   )
 }
 
-function MoviesList({ movies }) {
+// Left Side | MoviesList
+function MoviesList() {
   const [isOpen1, setIsOpen1] = useState(true)
+
   return (
     <div className="w-[42rem] max-w-[42rem] bg-custom-background-500 rounded-[0.9rem] relative overflow-y-auto">
       <button
@@ -103,33 +103,48 @@ function MoviesList({ movies }) {
         {isOpen1 ? '–' : '+'}
       </button>
 
-      {isOpen1 && (
-        <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
-          {movies?.map(movie => (
-            <li
-              key={movie.imdbID}
-              className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
-            >
-              <img
-                src={movie.Poster}
-                alt={`${movie.Title} poster`}
-                className="w-full h-auto grid-row-1 col-span-1 row-span-3"
-              />
-              <div className="grid col-span-1  ">
-                <h3 className="text-[1.8rem]">{movie.Title}</h3>
-                <div className="flex items-center gap-[0.8rem]">
-                  <span>🗓</span>
-                  <span>{movie.Year}</span>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      {isOpen1 && <Movies />}
     </div>
   )
 }
 
+function Movies() {
+  const [movies, setMovies] = useState(tempMovieData)
+  return (
+    <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
+      {movies?.map(movie => (
+        <Movie
+          movie={movie}
+          key={movie.imdbID}
+        />
+      ))}
+    </ul>
+  )
+}
+
+function Movie({ movie }) {
+  return (
+    <li
+      key={movie.imdbID}
+      className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
+    >
+      <img
+        src={movie.Poster}
+        alt={`${movie.Title} poster`}
+        className="w-full h-auto grid-row-1 col-span-1 row-span-3"
+      />
+      <div className="grid col-span-1  ">
+        <h3 className="text-[1.8rem]">{movie.Title}</h3>
+        <div className="flex items-center gap-[0.8rem]">
+          <span>🗓</span>
+          <span>{movie.Year}</span>
+        </div>
+      </div>
+    </li>
+  )
+}
+
+// Right Side | MoviesWatched
 function MoviesWatched() {
   const [isOpen2, setIsOpen2] = useState(true)
   const [watched, setWatched] = useState(tempWatchedData)
