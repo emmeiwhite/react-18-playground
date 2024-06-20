@@ -54,7 +54,7 @@ export default function App() {
   return (
     <>
       <Navigation movies={movies} />
-      <Main />
+      <Main movies={movies} />
     </>
   )
 }
@@ -104,17 +104,17 @@ function NumResults({ movies }) {
 }
 
 // Main Structural Component
-function Main() {
+function Main({ movies }) {
   return (
     <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
-      <MoviesList />
+      <MoviesList movies={movies} />
       <MoviesWatched />
     </main>
   )
 }
 
 // Left Side | MoviesList
-function MoviesList() {
+function MoviesList({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true)
 
   return (
@@ -126,7 +126,7 @@ function MoviesList() {
         {isOpen1 ? '–' : '+'}
       </button>
 
-      {isOpen1 && <Movies />}
+      {isOpen1 && <Movies movies={movies} />}
     </div>
   )
 }
