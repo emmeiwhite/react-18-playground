@@ -51,26 +51,34 @@ const tempWatchedData = [
   }
 ]
 
+const KEY = '10a55471'
 const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
+
+  let url = `http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`
+
+  // A SideEffect being done directly in the component | Not a good idea to do so
+  fetch(url)
+    .then(response => response.json())
+    .then(data => console.log(data))
   return (
     <>
       {/* <Navigation movies={movies} /> */}
-      {/* 
+
       <Navigation>
         <NumResults movies={movies} />
       </Navigation>
 
-      <Main movies={movies} /> */}
+      <Main movies={movies} />
 
       {/* <Modal>
         <Success />
         <Failure />
       </Modal> */}
 
-      <StarRating />
+      {/* <StarRating /> */}
     </>
   )
 }
@@ -78,7 +86,7 @@ export default function App() {
 // Structural Component
 function Navigation({ children }) {
   return (
-    <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem]">
+    <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem] text-white">
       <Logo />
       <Search />
       {/* <NumResults movies={movies} /> */}
@@ -135,9 +143,9 @@ function MoviesList({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true)
 
   return (
-    <div className="w-[42rem] max-w-[42rem] bg-custom-background-500 rounded-[0.9rem] relative overflow-y-auto">
+    <div className="w-[42rem] max-w-[42rem] bg-custom-text-dark rounded-[0.9rem] relative overflow-y-auto">
       <button
-        className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-text text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-900"
+        className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-white text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-100"
         onClick={() => setIsOpen1(open => !open)}
       >
         {isOpen1 ? '–' : '+'}
@@ -166,7 +174,7 @@ function Movie({ movie }) {
   return (
     <li
       key={movie.imdbID}
-      className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
+      className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-text py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-primary-light hover:text-white gap-x-[1rem]"
     >
       <img
         src={movie.Poster}
@@ -190,9 +198,9 @@ function MoviesWatched() {
   const [watched, setWatched] = useState(tempWatchedData)
 
   return (
-    <div className="w-[42rem] max-w-[42rem] bg-custom-background-500 rounded-[0.9rem] relative overflow-y-auto">
+    <div className="w-[42rem] max-w-[42rem] bg-custom-text-dark rounded-[0.9rem] relative overflow-y-auto">
       <button
-        className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-text text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-900"
+        className="absolute top-[0.8rem] right-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-white text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-100"
         onClick={() => setIsOpen2(open => !open)}
       >
         {isOpen2 ? '–' : '+'}
@@ -213,8 +221,8 @@ function WatchedSummary({ watched }) {
   const avgUserRating = average(watched.map(movie => movie.userRating))
   const avgRuntime = average(watched.map(movie => movie.runtime))
   return (
-    <div className="bg-custom-background-100 rounded-[0.9rem] shadow-md p-[2.2rem_3.2rem_1.8rem_3.2rem]">
-      <h2 className="uppercase text-[1.6rem] mb-[0.6rem]">Movies you watched</h2>
+    <div className=" rounded-[0.9rem] shadow-md p-[2.2rem_3.2rem_1.8rem_3.2rem] hover:bg-primary-light hover:text-white cursor-pointer">
+      <h2 className="uppercase text-[1.6rem] mb-[0.6rem] ">Movies you watched</h2>
       <div className="flex items-center gap-[2.4rem] text-[1.6rem] font-semibold">
         <p className="flex items-center gap-[0.8rem]">
           <span>#️⃣</span>
@@ -256,7 +264,7 @@ function WatchedMovie({ movie }) {
   return (
     <li
       key={movie.imdbID}
-      className="relative grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] text-[1.6rem]  bg-custom-background-500 py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-custom-background-100 gap-x-[1rem]"
+      className="relative grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] text-[1.6rem]  bg-custom-text py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-primary-light hover:text-white  gap-x-[1rem]"
     >
       <img
         src={movie.Poster}
