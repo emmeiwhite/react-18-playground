@@ -1,4 +1,4 @@
-import { Children, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Modal from './components/Modal'
 import Success from './components/Success'
 import Failure from './components/Failure'
@@ -59,10 +59,20 @@ export default function App() {
 
   let url = `http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`
 
+  const fetchMovies = async () => {
+    try {
+      const response = await fetch(url)
+      const data = await response.json()
+      setMovies(data.Search)
+    } catch (error) {
+      console.error('Error fetching movies:', error)
+    }
+  }
+  useEffect(() => {
+    fetchMovies()
+  }, [])
   // A SideEffect being done directly in the component | Not a good idea to do so
-  fetch(url)
-    .then(response => response.json())
-    .then(data => console.log(data))
+
   return (
     <>
       {/* <Navigation movies={movies} /> */}
