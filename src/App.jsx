@@ -56,16 +56,32 @@ const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  let url = `http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`
+  let query = 'asdfasfadsfasfadsfasdfasdfgasdf'
+  let url = `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
 
   const fetchMovies = async () => {
+    setIsLoading(true)
     try {
       const response = await fetch(url)
+      console.log(response)
+      if (!response.ok) {
+        throw new Error()
+      }
+
+      console.log('Hello!')
       const data = await response.json()
+
+      console.log('############***********#############')
+      if (data.Response === 'False') throw new Error('Movie not found')
       setMovies(data.Search)
+      setIsLoading(false)
     } catch (error) {
-      console.error('Error fetching movies:', error)
+      setError(error.message)
+      setIsLoading(false)
+      console.error('Error fetching movies:', error.message)
     }
   }
   useEffect(() => {
@@ -81,7 +97,11 @@ export default function App() {
         <NumResults movies={movies} />
       </Navigation>
 
-      <Main movies={movies} />
+      <Main
+        movies={movies}
+        isLoading={isLoading}
+        error={error}
+      />
 
       {/* <Modal>
         <Success />
@@ -139,17 +159,22 @@ function NumResults({ movies }) {
 }
 
 // Main Structural Component
-function Main({ movies }) {
+function Main({ movies, isLoading, error }) {
   return (
     <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
-      <MoviesList movies={movies} />
+      <MoviesList
+        movies={movies}
+        isLoading={isLoading}
+        error={error}
+      />
+
       <MoviesWatched />
     </main>
   )
 }
 
 // Left Side | MoviesList
-function MoviesList({ movies }) {
+function MoviesList({ movies, isLoading, error }) {
   const [isOpen1, setIsOpen1] = useState(true)
 
   return (
@@ -161,12 +186,28 @@ function MoviesList({ movies }) {
         {isOpen1 ? '–' : '+'}
       </button>
 
-      {isOpen1 && <Movies movies={movies} />}
+      {isOpen1 && (
+        <Movies
+          movies={movies}
+          isLoading={isLoading}
+          error={error}
+        />
+      )}
     </div>
   )
 }
 
-function Movies({ movies }) {
+function Movies({ movies, isLoading, error }) {
+  return (
+    <>
+      {isLoading && <h3 className="text-3xl text-center mt-8">Loading...</h3>}
+      {!isLoading && !error && <ListOfMovies movies={movies} />}
+      {error && <h3 className="text-3xl text-center mt-8">{error}</h3>}
+    </>
+  )
+}
+
+function ListOfMovies({ movies }) {
   return (
     <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
       {movies?.map(movie => (
@@ -178,7 +219,6 @@ function Movies({ movies }) {
     </ul>
   )
 }
-
 // Stateless Presentational component
 function Movie({ movie }) {
   return (
