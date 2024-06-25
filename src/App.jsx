@@ -57,13 +57,15 @@ const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState('')
 
-  let query = 'asdfasfadsfasfadsfasdfasdfgasdf'
+  const [query, setQuery] = useState('')
+
   let url = `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
 
   const fetchMovies = async () => {
     setIsLoading(true)
+    setError('')
     try {
       const response = await fetch(url)
       console.log(response)
@@ -84,16 +86,25 @@ export default function App() {
       console.error('Error fetching movies:', error.message)
     }
   }
+
   useEffect(() => {
+    if (query.length < 3) {
+      setMovies([])
+      setError('')
+      return
+    }
     fetchMovies()
-  }, [])
+  }, [query])
   // A SideEffect being done directly in the component | Not a good idea to do so
 
   return (
     <>
       {/* <Navigation movies={movies} /> */}
 
-      <Navigation>
+      <Navigation
+        query={query}
+        setQuery={setQuery}
+      >
         <NumResults movies={movies} />
       </Navigation>
 
@@ -114,11 +125,14 @@ export default function App() {
 }
 
 // Structural Component
-function Navigation({ children }) {
+function Navigation({ children, query, setQuery }) {
   return (
     <nav className="grid grid-cols-3 items-center h-[7.2rem] py-0 px-[3.2rem] bg-primary rounded-[0.9rem] text-white">
       <Logo />
-      <Search />
+      <Search
+        query={query}
+        setQuery={setQuery}
+      />
       {/* <NumResults movies={movies} /> */}
       {children}
     </nav>
@@ -136,8 +150,7 @@ function Logo() {
 }
 
 // Stateful Component
-function Search() {
-  const [query, setQuery] = useState('')
+function Search({ query, setQuery }) {
   return (
     <input
       className="justify-self-center border-none px-[1.6rem] py-[1.1rem] text-[1.8rem] rounded-[0.7rem] w-[40rem] transition-all duration-300 text-custom-text bg-primary-light placeholder-custom-text-dark focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:transform focus:-translate-y-0.5"
