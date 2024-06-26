@@ -58,8 +58,19 @@ export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedId, setSelectedId] = useState(null)
+  const [query, setQuery] = useState('Spirited Away')
 
-  const [query, setQuery] = useState('')
+  const handleSelectedId = id => {
+    // Setting up the id as well as handling up double click when the id is already selected and user clicks on the same id again (i-e., same movie from the left list again)
+    setSelectedId(prevId => {
+      return id === prevId ? null : id
+    })
+  }
+
+  const removeSelectedId = () => {
+    setSelectedId(null)
+  }
 
   let url = `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
 
@@ -68,22 +79,20 @@ export default function App() {
     setError('')
     try {
       const response = await fetch(url)
-      console.log(response)
+      // console.log(response)
       if (!response.ok) {
         throw new Error()
       }
 
-      console.log('Hello!')
       const data = await response.json()
 
-      console.log('############***********#############')
       if (data.Response === 'False') throw new Error('Movie not found')
       setMovies(data.Search)
       setIsLoading(false)
     } catch (error) {
       setError(error.message)
       setIsLoading(false)
-      console.error('Error fetching movies:', error.message)
+      // console.error('Error fetching movies:', error.message)
     }
   }
 
@@ -112,6 +121,9 @@ export default function App() {
         movies={movies}
         isLoading={isLoading}
         error={error}
+        handleSelectedId={handleSelectedId}
+        selectedId={selectedId}
+        removeSelectedId={removeSelectedId}
       />
 
       {/* <Modal>
@@ -172,22 +184,26 @@ function NumResults({ movies }) {
 }
 
 // Main Structural Component
-function Main({ movies, isLoading, error }) {
+function Main({ movies, isLoading, error, handleSelectedId, selectedId, removeSelectedId }) {
   return (
     <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
       <MoviesList
         movies={movies}
         isLoading={isLoading}
         error={error}
+        handleSelectedId={handleSelectedId}
       />
 
-      <MoviesWatched />
+      <MoviesWatched
+        selectedId={selectedId}
+        removeSelectedId={removeSelectedId}
+      />
     </main>
   )
 }
 
-// Left Side | MoviesList
-function MoviesList({ movies, isLoading, error }) {
+// 1. Left Side | MoviesList
+function MoviesList({ movies, isLoading, error, handleSelectedId }) {
   const [isOpen1, setIsOpen1] = useState(true)
 
   return (
@@ -204,40 +220,48 @@ function MoviesList({ movies, isLoading, error }) {
           movies={movies}
           isLoading={isLoading}
           error={error}
+          handleSelectedId={handleSelectedId}
         />
       )}
     </div>
   )
 }
 
-function Movies({ movies, isLoading, error }) {
+function Movies({ movies, isLoading, error, handleSelectedId }) {
   return (
     <>
       {isLoading && <h3 className="text-3xl text-center mt-8">Loading...</h3>}
-      {!isLoading && !error && <ListOfMovies movies={movies} />}
+      {!isLoading && !error && (
+        <ListOfMovies
+          movies={movies}
+          handleSelectedId={handleSelectedId}
+        />
+      )}
       {error && <h3 className="text-3xl text-center mt-8">{error}</h3>}
     </>
   )
 }
 
-function ListOfMovies({ movies }) {
+function ListOfMovies({ movies, handleSelectedId }) {
   return (
     <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
       {movies?.map(movie => (
         <Movie
           movie={movie}
           key={movie.imdbID}
+          handleSelectedId={handleSelectedId}
         />
       ))}
     </ul>
   )
 }
 // Stateless Presentational component
-function Movie({ movie }) {
+function Movie({ movie, handleSelectedId }) {
   return (
     <li
       key={movie.imdbID}
       className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-text py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-primary-light hover:text-white gap-x-[1rem]"
+      onClick={() => handleSelectedId(movie.imdbID)}
     >
       <img
         src={movie.Poster}
@@ -255,10 +279,10 @@ function Movie({ movie }) {
   )
 }
 
-// Right Side | MoviesWatched
-function MoviesWatched() {
+// 2. Right Side | MoviesWatched
+function MoviesWatched({ selectedId, removeSelectedId }) {
   const [isOpen2, setIsOpen2] = useState(true)
-  const [watched, setWatched] = useState(tempWatchedData)
+  const [watched, setWatched] = useState([])
 
   return (
     <div className="w-[42rem] max-w-[42rem] bg-custom-text-dark rounded-[0.9rem] relative overflow-y-auto">
@@ -268,16 +292,34 @@ function MoviesWatched() {
       >
         {isOpen2 ? '–' : '+'}
       </button>
+
+      {selectedId ? (
+        <MovieDetail
+          selectedId={selectedId}
+          removeSelectedId={removeSelectedId}
+        />
+      ) : (
+        <MovieDetailsWrapper
+          isOpen2={isOpen2}
+          watched={watched}
+        />
+      )}
+    </div>
+  )
+}
+
+function MovieDetailsWrapper({ isOpen2, watched }) {
+  return (
+    <>
       {isOpen2 && (
         <>
           <WatchedSummary watched={watched} />
           <WatchedList watched={watched} />
         </>
       )}
-    </div>
+    </>
   )
 }
-
 // Stateless presentational component | We are using derived state here
 function WatchedSummary({ watched }) {
   const avgImdbRating = average(watched.map(movie => movie.imdbRating))
@@ -350,5 +392,20 @@ function WatchedMovie({ movie }) {
         </p>
       </div>
     </li>
+  )
+}
+
+// 3. WatchedMovies also have another toggling component, SelectedMovieDetail
+function MovieDetail({ selectedId, removeSelectedId }) {
+  return (
+    <div>
+      <button
+        className="absolute top-[0.8rem] left-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-white text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-100"
+        onClick={removeSelectedId}
+      >
+        &larr;
+      </button>
+      {selectedId}
+    </div>
   )
 }
