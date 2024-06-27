@@ -21,11 +21,13 @@ export default function StarRating() {
 }
 
 function Star({ handleClick, totalFill }) {
-  let ratingCSS = totalFill && 'bg-yellow-500'
+  let ratingCSS = totalFill && 'bg-yellow-200'
   return (
     <div
       className={`w-10 h-10 bg-gray-400 star-shape cursor-pointer ${ratingCSS}`}
       onClick={handleClick}
+      onMouseEnter={handleClick}
+      onMouseLeave={handleClick}
     ></div>
   )
 }

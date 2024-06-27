@@ -230,7 +230,7 @@ function MoviesList({ movies, isLoading, error, handleSelectedId }) {
 function Movies({ movies, isLoading, error, handleSelectedId }) {
   return (
     <>
-      {isLoading && <h3 className="text-3xl text-center mt-8">Loading...</h3>}
+      {isLoading && <Loader />}
       {!isLoading && !error && (
         <ListOfMovies
           movies={movies}
@@ -242,6 +242,9 @@ function Movies({ movies, isLoading, error, handleSelectedId }) {
   )
 }
 
+function Loader() {
+  return <h3 className="text-3xl text-center mt-8">Loading...</h3>
+}
 function ListOfMovies({ movies, handleSelectedId }) {
   return (
     <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
@@ -397,15 +400,119 @@ function WatchedMovie({ movie }) {
 
 // 3. WatchedMovies also have another toggling component, SelectedMovieDetail
 function MovieDetail({ selectedId, removeSelectedId }) {
+  const [movieDetail, setMovieDetail] = useState(null)
+  const [loading, setLoading] = useState(false)
+  let url = `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
+
+  async function getMovieDetail() {
+    setLoading(true)
+    try {
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error('Something went wrong while fetching data')
+      }
+
+      const data = await response.json()
+      console.log(data)
+      setMovieDetail(data)
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
+    }
+  }
+
+  // We must not forget that useEffect is rendered only after the Browser Paint, which happens after the COMMIT PHASE not after re-rendering of Virtual DOM
+  useEffect(() => {
+    getMovieDetail()
+  }, [selectedId])
   return (
-    <div>
-      <button
-        className="absolute top-[0.8rem] left-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-white text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-100"
-        onClick={removeSelectedId}
-      >
-        &larr;
-      </button>
-      {selectedId}
+    <div className="">
+      <header>
+        <button
+          className="absolute top-[0.8rem] left-[0.8rem] h-[2.4rem] w-[2.4rem] rounded-full border-none text-white text-[1.4rem] font-bold cursor-pointer z-50 flex items-center justify-center bg-custom-background-100"
+          onClick={removeSelectedId}
+        >
+          &larr;
+        </button>
+      </header>
+
+      {movieDetail?.Title && (
+        <MovieDetailInfo
+          movie={movieDetail}
+          loading={loading}
+        />
+      )}
     </div>
+  )
+}
+
+function MovieDetailInfo({ movie, loading }) {
+  const {
+    Title: title,
+    Year: year,
+    Rated: rated,
+    Released: released,
+    Runtime: runtime,
+    Genre: genre,
+    Director: director,
+    Writer: writer,
+    Actors: actors,
+    Plot: plot,
+    Language: language,
+    Country: country,
+    Awards: awards,
+    Poster: poster,
+    Ratings: ratings,
+    Metascore: metascore,
+    imdbRating: imdbRating,
+    imdbVotes: imdbVotes,
+    imdbID: imdbID,
+    Type: type,
+    DVD: dvd,
+    BoxOffice: boxOffice,
+    Production: production,
+    Website: website,
+    Response: response
+  } = movie
+
+  if (loading) {
+    return <Loader />
+  }
+
+  return (
+    <>
+      <div className="grid grid-cols-[140px_1fr]">
+        <img
+          src={poster}
+          alt={`Poster of ${title} movie`}
+          className="w-full"
+        />
+        <div className="details-overview ">
+          <h2>{title}</h2>
+
+          <div className="text-xl">
+            <p>
+              {released} &bull; {runtime}
+            </p>
+
+            <p className="my-5">{genre}</p>
+            <p>
+              <span>🌟</span>
+              {imdbRating} IMDb Rating
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <section className="p-6 mt-5">
+        <StarRating />
+        <p className="text-2xl text-emerald-900 text mt-6">
+          <em>{plot}</em>
+        </p>
+        <p className="my-4  text-xl text-orange-900 font-semibold shadow-sm ">Starring {actors}</p>
+        <p className="font-bold text-2xl">Directed by {director}</p>
+      </section>
+    </>
   )
 }
