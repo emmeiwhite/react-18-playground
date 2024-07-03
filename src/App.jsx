@@ -564,12 +564,16 @@ function MovieDetailInfo({ movie, loading, handleAddWatched, removeSelectedId })
           handleUserRating={handleUserRating}
           length={10}
         />
-        <button
-          className="px-3 py-2 text-white text-[1.4rem] font-bold cursor-pointer  bg-blue-700 rounded-md mt-4"
-          onClick={handleWatchedAddList}
-        >
-          + Add To List
-        </button>
+
+        {userRating > 0 && (
+          <button
+            className="px-3 py-2 text-white text-[1.4rem] font-bold cursor-pointer  bg-blue-700 rounded-md mt-4"
+            onClick={handleWatchedAddList}
+          >
+            + Add To List
+          </button>
+        )}
+
         <p className="text-2xl text-emerald-900 text mt-6">
           <em>{plot}</em>
         </p>
