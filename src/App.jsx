@@ -72,11 +72,16 @@ export default function App() {
   // Handle the watched elements, basically we'll add new watched items to the list
   function handleAddWatched(movie) {
     setWatched(prevWatched => {
+      const isTrue = watched.find(moviePrev => moviePrev.imdbID === movie.imdbID)
+      if (isTrue) {
+        return watched
+      }
       const newWatched = [...prevWatched, movie]
-      console.log('Matched state being generated on the fly as per user click')
-      console.log(newWatched)
+
       return newWatched
     })
+
+    setSelectedId(null)
   }
 
   const removeSelectedId = () => {
