@@ -56,6 +56,7 @@ const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
+  const [watched, setWatched] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [selectedId, setSelectedId] = useState(null)
@@ -65,6 +66,16 @@ export default function App() {
     // Setting up the id as well as handling up double click when the id is already selected and user clicks on the same id again (i-e., same movie from the left list again)
     setSelectedId(prevId => {
       return id === prevId ? null : id
+    })
+  }
+
+  // Handle the watched elements, basically we'll add new watched items to the list
+  function handleAddWatched(movie) {
+    setWatched(prevWatched => {
+      const newWatched = [...prevWatched, movie]
+      console.log('Matched state being generated on the fly as per user click')
+      console.log(newWatched)
+      return newWatched
     })
   }
 
@@ -124,6 +135,8 @@ export default function App() {
         handleSelectedId={handleSelectedId}
         selectedId={selectedId}
         removeSelectedId={removeSelectedId}
+        watchedMovies={watched}
+        handleAddWatched={handleAddWatched}
       />
 
       {/* <Modal>
@@ -184,7 +197,16 @@ function NumResults({ movies }) {
 }
 
 // Main Structural Component
-function Main({ movies, isLoading, error, handleSelectedId, selectedId, removeSelectedId }) {
+function Main({
+  movies,
+  isLoading,
+  error,
+  handleSelectedId,
+  selectedId,
+  removeSelectedId,
+  watchedMovies,
+  handleAddWatched
+}) {
   return (
     <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
       <MoviesList
@@ -197,6 +219,8 @@ function Main({ movies, isLoading, error, handleSelectedId, selectedId, removeSe
       <MoviesWatched
         selectedId={selectedId}
         removeSelectedId={removeSelectedId}
+        watchedMovies={watchedMovies}
+        handleAddWatched={handleAddWatched}
       />
     </main>
   )
@@ -245,7 +269,8 @@ function Movies({ movies, isLoading, error, handleSelectedId }) {
 function Loader() {
   return <h3 className="text-3xl text-center mt-8">Loading...</h3>
 }
-function ListOfMovies({ movies, handleSelectedId }) {
+
+function ListOfMovies({ movies, handleSelectedId, handleAddWatched }) {
   return (
     <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
       {movies?.map(movie => (
@@ -264,7 +289,9 @@ function Movie({ movie, handleSelectedId }) {
     <li
       key={movie.imdbID}
       className="relative grid grid-cols-[4rem_1fr] grid-rows-[1.6rem auto] text-[1.6rem] bg-custom-text py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-primary-light hover:text-white gap-x-[1rem]"
-      onClick={() => handleSelectedId(movie.imdbID)}
+      onClick={() => {
+        handleSelectedId(movie.imdbID)
+      }}
     >
       <img
         src={movie.Poster}
@@ -283,9 +310,8 @@ function Movie({ movie, handleSelectedId }) {
 }
 
 // 2. Right Side | MoviesWatched
-function MoviesWatched({ selectedId, removeSelectedId }) {
+function MoviesWatched({ selectedId, removeSelectedId, watchedMovies, handleAddWatched }) {
   const [isOpen2, setIsOpen2] = useState(true)
-  const [watched, setWatched] = useState([])
 
   return (
     <div className="w-[42rem] max-w-[42rem] bg-custom-text-dark rounded-[0.9rem] relative overflow-y-auto">
@@ -300,11 +326,12 @@ function MoviesWatched({ selectedId, removeSelectedId }) {
         <MovieDetail
           selectedId={selectedId}
           removeSelectedId={removeSelectedId}
+          handleAddWatched={handleAddWatched}
         />
       ) : (
         <MovieDetailsWrapper
           isOpen2={isOpen2}
-          watched={watched}
+          watched={watchedMovies}
         />
       )}
     </div>
@@ -325,9 +352,11 @@ function MovieDetailsWrapper({ isOpen2, watched }) {
 }
 // Stateless presentational component | We are using derived state here
 function WatchedSummary({ watched }) {
-  const avgImdbRating = average(watched.map(movie => movie.imdbRating))
-  const avgUserRating = average(watched.map(movie => movie.userRating))
-  const avgRuntime = average(watched.map(movie => movie.runtime))
+  console.log('******* WatchedSummary *********')
+  console.log(watched)
+  const avgImdbRating = average(watched.map(movie => Number(movie.imdbRating)))
+  const avgUserRating = average(watched.map(movie => Number(movie.userRating)))
+  const avgRuntime = average(watched.map(movie => Number(movie.runtime)))
   return (
     <div className=" rounded-[0.9rem] shadow-md p-[2.2rem_3.2rem_1.8rem_3.2rem] hover:bg-primary-light hover:text-white cursor-pointer">
       <h2 className="uppercase text-[1.6rem] mb-[0.6rem] ">Movies you watched</h2>
@@ -369,24 +398,25 @@ function WatchedList({ watched }) {
 
 // Presentational Component | Stateless
 function WatchedMovie({ movie }) {
+  console.log(movie)
   return (
     <li
       key={movie.imdbID}
       className="relative grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] text-[1.6rem]  bg-custom-text py-[1.6rem] px-[3.2rem] border-b-[1px_solid_custom-background-100] cursor-pointer transition-all duration-300 hover:bg-primary-light hover:text-white  gap-x-[1rem]"
     >
       <img
-        src={movie.Poster}
-        alt={`${movie.Title} poster`}
+        src={movie.poster}
+        alt={`${movie.title} poster`}
         className="w-full h-full row-start-1 row-span-full"
       />
-      <h3 className="grid-row-2 col-span-1 text-3xl">{movie.Title}</h3>
+      <h3 className="grid-row-2 col-span-1 text-3xl">{movie.title}</h3>
       <div className="flex gap-8">
         <p className="flex items-center gap-[0.8rem]">
           <span>⭐️</span>
           <span>{movie.imdbRating}</span>
         </p>
         <p className="flex items-center gap-[0.8rem]">
-          <span>🌟</span>
+          <span>🌟 Testing</span>
           <span>{movie.userRating}</span>
         </p>
         <p className="flex items-center gap-[0.8rem]">
@@ -399,7 +429,7 @@ function WatchedMovie({ movie }) {
 }
 
 // 3. WatchedMovies also have another toggling component, SelectedMovieDetail
-function MovieDetail({ selectedId, removeSelectedId }) {
+function MovieDetail({ selectedId, removeSelectedId, handleAddWatched }) {
   const [movieDetail, setMovieDetail] = useState(null)
   const [loading, setLoading] = useState(false)
   let url = `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
@@ -441,13 +471,14 @@ function MovieDetail({ selectedId, removeSelectedId }) {
         <MovieDetailInfo
           movie={movieDetail}
           loading={loading}
+          handleAddWatched={handleAddWatched}
         />
       )}
     </div>
   )
 }
 
-function MovieDetailInfo({ movie, loading }) {
+function MovieDetailInfo({ movie, loading, handleAddWatched }) {
   const {
     Title: title,
     Year: year,
@@ -476,6 +507,18 @@ function MovieDetailInfo({ movie, loading }) {
     Response: response
   } = movie
 
+  function handleWatchedAddList() {
+    const movieWatched = {
+      imdbID,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: runtime.split(' ').at(0),
+      userRating: Number(imdbRating)
+    }
+    handleAddWatched(movieWatched)
+  }
   if (loading) {
     return <Loader />
   }
@@ -507,6 +550,12 @@ function MovieDetailInfo({ movie, loading }) {
 
       <section className="p-6 mt-5">
         <StarRating />
+        <button
+          className="px-3 py-2 text-white text-[1.4rem] font-bold cursor-pointer  bg-blue-700 rounded-md mt-4"
+          onClick={handleWatchedAddList}
+        >
+          + Add To List
+        </button>
         <p className="text-2xl text-emerald-900 text mt-6">
           <em>{plot}</em>
         </p>
