@@ -1,14 +1,15 @@
 import { useState } from 'react'
 
-export default function StarRating() {
+export default function StarRating({ handleUserRating, length }) {
   const [rating, setRating] = useState(0) // State to store the current rating
 
   function handleClick(index) {
     setRating(index + 1)
+    handleUserRating(rating)
   }
 
   function renderStars() {
-    return Array.from({ length: 5 }, (_, i) => (
+    return Array.from({ length }, (_, i) => (
       <Star
         key={i}
         handleClick={() => handleClick(i)}
@@ -17,7 +18,12 @@ export default function StarRating() {
       />
     ))
   }
-  return <div className="flex gap-3">{renderStars()}</div>
+  return (
+    <div className="flex gap-3">
+      {renderStars()}
+      <h3 className="text-3xl">{rating}</h3>
+    </div>
+  )
 }
 
 function Star({ handleClick, totalFill }) {

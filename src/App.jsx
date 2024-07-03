@@ -80,8 +80,6 @@ export default function App() {
 
       return newWatched
     })
-
-    setSelectedId(null)
   }
 
   const removeSelectedId = () => {
@@ -421,7 +419,7 @@ function WatchedMovie({ movie }) {
           <span>{movie.imdbRating}</span>
         </p>
         <p className="flex items-center gap-[0.8rem]">
-          <span>🌟 Testing</span>
+          <span>🌟</span>
           <span>{movie.userRating}</span>
         </p>
         <p className="flex items-center gap-[0.8rem]">
@@ -477,13 +475,20 @@ function MovieDetail({ selectedId, removeSelectedId, handleAddWatched }) {
           movie={movieDetail}
           loading={loading}
           handleAddWatched={handleAddWatched}
+          removeSelectedId={removeSelectedId}
         />
       )}
     </div>
   )
 }
 
-function MovieDetailInfo({ movie, loading, handleAddWatched }) {
+function MovieDetailInfo({ movie, loading, handleAddWatched, removeSelectedId }) {
+  const [userRating, setUserRating] = useState(0)
+
+  function handleUserRating(userRatingStars) {
+    console.log(userRatingStars)
+    setUserRating(userRatingStars)
+  }
   const {
     Title: title,
     Year: year,
@@ -520,9 +525,10 @@ function MovieDetailInfo({ movie, loading, handleAddWatched }) {
       poster,
       imdbRating: Number(imdbRating),
       runtime: runtime.split(' ').at(0),
-      userRating: Number(imdbRating)
+      userRating: userRating
     }
     handleAddWatched(movieWatched)
+    removeSelectedId()
   }
   if (loading) {
     return <Loader />
@@ -554,7 +560,10 @@ function MovieDetailInfo({ movie, loading, handleAddWatched }) {
       </div>
 
       <section className="p-6 mt-5">
-        <StarRating />
+        <StarRating
+          handleUserRating={handleUserRating}
+          length={10}
+        />
         <button
           className="px-3 py-2 text-white text-[1.4rem] font-bold cursor-pointer  bg-blue-700 rounded-md mt-4"
           onClick={handleWatchedAddList}
