@@ -580,6 +580,11 @@ function MovieDetailInfo({
   useEffect(() => {
     if (!title) return
     document.title = `${title}`
+
+    // Clean up function | When component unmounts and also on state update I believe
+    return () => {
+      document.title = 'Movies App'
+    }
   }, [title])
 
   let isMovieWatched = watched.map(movie => movie.imdbID).includes(selectedId)
