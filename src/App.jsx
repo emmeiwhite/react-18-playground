@@ -72,14 +72,18 @@ export default function App() {
   // Handle the watched elements, basically we'll add new watched items to the list
   function handleAddWatched(movie) {
     setWatched(prevWatched => {
-      const isTrue = watched.find(moviePrev => moviePrev.imdbID === movie.imdbID)
-      if (isTrue) {
+      const isWatched = watched.find(moviePrev => moviePrev.imdbID === movie.imdbID)
+      if (isWatched) {
         return watched
       }
       const newWatched = [...prevWatched, movie]
 
       return newWatched
     })
+  }
+
+  function removeWatchedMovie(id) {
+    setWatched(watched => watched.filter(movie => movie.imdbID !== id))
   }
 
   const removeSelectedId = () => {
@@ -140,6 +144,8 @@ export default function App() {
         removeSelectedId={removeSelectedId}
         watchedMovies={watched}
         handleAddWatched={handleAddWatched}
+        setWatched={setWatched}
+        removeWatchedMovie={removeWatchedMovie}
       />
 
       {/* <Modal>
@@ -208,7 +214,9 @@ function Main({
   selectedId,
   removeSelectedId,
   watchedMovies,
-  handleAddWatched
+  handleAddWatched,
+  setWatched,
+  removeWatchedMovie
 }) {
   return (
     <main className="mt-[2.4rem] flex gap-[2.4rem] justify-center h-[calc(100vh-7.2rem-3*2.4rem)]">
@@ -224,6 +232,8 @@ function Main({
         removeSelectedId={removeSelectedId}
         watchedMovies={watchedMovies}
         handleAddWatched={handleAddWatched}
+        setWatched={setWatched}
+        removeWatchedMovie={removeWatchedMovie}
       />
     </main>
   )
@@ -313,7 +323,14 @@ function Movie({ movie, handleSelectedId }) {
 }
 
 // 2. Right Side | MoviesWatched
-function MoviesWatched({ selectedId, removeSelectedId, watchedMovies, handleAddWatched }) {
+function MoviesWatched({
+  selectedId,
+  removeSelectedId,
+  watchedMovies,
+  handleAddWatched,
+  setWatched,
+  removeWatchedMovie
+}) {
   const [isOpen2, setIsOpen2] = useState(true)
 
   return (
@@ -330,24 +347,30 @@ function MoviesWatched({ selectedId, removeSelectedId, watchedMovies, handleAddW
           selectedId={selectedId}
           removeSelectedId={removeSelectedId}
           handleAddWatched={handleAddWatched}
+          watched={watchedMovies}
+          setWatched={setWatched}
         />
       ) : (
         <MovieDetailsWrapper
           isOpen2={isOpen2}
           watched={watchedMovies}
+          removeWatchedMovie={removeWatchedMovie}
         />
       )}
     </div>
   )
 }
 
-function MovieDetailsWrapper({ isOpen2, watched }) {
+function MovieDetailsWrapper({ isOpen2, watched, removeWatchedMovie }) {
   return (
     <>
       {isOpen2 && (
         <>
           <WatchedSummary watched={watched} />
-          <WatchedList watched={watched} />
+          <WatchedList
+            watched={watched}
+            removeWatchedMovie={removeWatchedMovie}
+          />
         </>
       )}
     </>
@@ -370,11 +393,11 @@ function WatchedSummary({ watched }) {
         </p>
         <p className="flex items-center gap-[0.8rem]">
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>{avgImdbRating.toFixed(2)}</span>
         </p>
         <p className="flex items-center gap-[0.8rem]">
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(2)}</span>
         </p>
         <p className="flex items-center gap-[0.8rem]">
           <span>⏳</span>
@@ -386,13 +409,14 @@ function WatchedSummary({ watched }) {
 }
 
 // Presentational Component
-function WatchedList({ watched }) {
+function WatchedList({ watched, removeWatchedMovie }) {
   return (
     <ul className="list py-[0.8rem] px-0 list-none">
       {watched.map(movie => (
         <WatchedMovie
           movie={movie}
           key={movie.imdbID}
+          removeWatchedMovie={removeWatchedMovie}
         />
       ))}
     </ul>
@@ -400,7 +424,7 @@ function WatchedList({ watched }) {
 }
 
 // Presentational Component | Stateless
-function WatchedMovie({ movie }) {
+function WatchedMovie({ movie, removeWatchedMovie }) {
   console.log(movie)
   return (
     <li
@@ -426,13 +450,22 @@ function WatchedMovie({ movie }) {
           <span>⏳</span>
           <span>{movie.runtime} min</span>
         </p>
+
+        <button onClick={() => removeWatchedMovie(movie.imdbID)}>❌</button>
       </div>
     </li>
   )
 }
 
 // 3. WatchedMovies also have another toggling component, SelectedMovieDetail
-function MovieDetail({ selectedId, removeSelectedId, handleAddWatched }) {
+function MovieDetail({
+  selectedId,
+  removeSelectedId,
+  handleAddWatched,
+  watched,
+  setWatched,
+  removeWatchedMovie
+}) {
   const [movieDetail, setMovieDetail] = useState(null)
   const [loading, setLoading] = useState(false)
   let url = `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
@@ -476,19 +509,27 @@ function MovieDetail({ selectedId, removeSelectedId, handleAddWatched }) {
           loading={loading}
           handleAddWatched={handleAddWatched}
           removeSelectedId={removeSelectedId}
+          watched={watched}
+          setWatched={setWatched}
+          selectedId={selectedId}
+          removeWatchedMovie={removeWatchedMovie}
         />
       )}
     </div>
   )
 }
 
-function MovieDetailInfo({ movie, loading, handleAddWatched, removeSelectedId }) {
+function MovieDetailInfo({
+  movie,
+  loading,
+  removeSelectedId,
+  watched,
+  setWatched,
+  selectedId,
+  removeWatchedMovie
+}) {
   const [userRating, setUserRating] = useState(0)
 
-  function handleUserRating(userRatingStars) {
-    console.log(userRatingStars)
-    setUserRating(userRatingStars)
-  }
   const {
     Title: title,
     Year: year,
@@ -517,6 +558,33 @@ function MovieDetailInfo({ movie, loading, handleAddWatched, removeSelectedId })
     Response: response
   } = movie
 
+  function handleUserRating(userRatingStars) {
+    setUserRating(userRatingStars)
+  }
+
+  // Handle the watched elements, basically we'll add new watched items to the list
+  function handleAddWatched(movie) {
+    setWatched(prevWatched => {
+      let isWatched = watched.find(moviePrev => moviePrev.imdbID === movie.imdbID)
+      if (isWatched) {
+        return watched
+      }
+
+      const newWatched = [...prevWatched, movie]
+
+      return newWatched
+    })
+  }
+
+  // A side-effect | Adding title
+  useEffect(() => {
+    if (!title) return
+    document.title = `${title}`
+  }, [title])
+
+  let isMovieWatched = watched.map(movie => movie.imdbID).includes(selectedId)
+  let userRatingOfMovie = watched.find(movie => movie.imdbID === selectedId)
+
   function handleWatchedAddList() {
     const movieWatched = {
       imdbID,
@@ -525,11 +593,13 @@ function MovieDetailInfo({ movie, loading, handleAddWatched, removeSelectedId })
       poster,
       imdbRating: Number(imdbRating),
       runtime: runtime.split(' ').at(0),
-      userRating: userRating
+      userRating: userRating,
+      isWatched: true
     }
     handleAddWatched(movieWatched)
     removeSelectedId()
   }
+
   if (loading) {
     return <Loader />
   }
@@ -560,18 +630,27 @@ function MovieDetailInfo({ movie, loading, handleAddWatched, removeSelectedId })
       </div>
 
       <section className="p-6 mt-5">
-        <StarRating
-          handleUserRating={handleUserRating}
-          length={10}
-        />
+        {!isMovieWatched ? (
+          <>
+            <StarRating
+              handleUserRating={handleUserRating}
+              length={10}
+            />
 
-        {userRating > 0 && (
-          <button
-            className="px-3 py-2 text-white text-[1.4rem] font-bold cursor-pointer  bg-blue-700 rounded-md mt-4"
-            onClick={handleWatchedAddList}
-          >
-            + Add To List
-          </button>
+            {userRating > 0 && (
+              <button
+                className="px-3 py-2 text-white text-[1.4rem] font-bold cursor-pointer  bg-blue-700 rounded-md mt-4"
+                onClick={handleWatchedAddList}
+              >
+                + Add To List
+              </button>
+            )}
+          </>
+        ) : (
+          <p>
+            You have already watched this with the rating{' '}
+            <strong>{userRatingOfMovie.userRating}</strong> 🌟
+          </p>
         )}
 
         <p className="text-2xl text-emerald-900 text mt-6">
