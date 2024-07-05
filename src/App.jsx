@@ -69,14 +69,38 @@ export default function App() {
     })
   }
 
-  // Handle the watched elements, basically we'll add new watched items to the list
+  // function handleAddWatched(movie) {
+  //   setWatched(prevWatched => {
+  //     const isWatched = prevWatched.find(moviePrev => moviePrev.imdbID === movie.imdbID)
+  //     if (isWatched) {
+  //       return prevWatched
+  //     }
+  //     const newWatched = [...prevWatched, movie]
+
+  //     // Updating localStorage with the new list of watched movies
+  //     localStorage.setItem('watched', JSON.stringify(newWatched))
+  //     return newWatched
+  //   })
+  // }
+
   function handleAddWatched(movie) {
+    console.log('Adding movie:', movie)
+
     setWatched(prevWatched => {
-      const isWatched = watched.find(moviePrev => moviePrev.imdbID === movie.imdbID)
+      console.log('Previous watched movies:', prevWatched)
+
+      const isWatched = prevWatched.find(moviePrev => moviePrev.imdbID === movie.imdbID)
       if (isWatched) {
-        return watched
+        console.log('Movie already watched:', movie)
+        return prevWatched
       }
+
       const newWatched = [...prevWatched, movie]
+      console.log('New watched movies:', newWatched)
+
+      // Updating localStorage with the new list of watched movies
+      localStorage.setItem('watchedMovies', JSON.stringify(newWatched))
+      console.log('Updated localStorage:', localStorage.getItem('watchedMovies'))
 
       return newWatched
     })
@@ -114,6 +138,11 @@ export default function App() {
     }
   }
 
+  // Setting localStorage here and run it everytime watched is a new state
+  useEffect(() => {
+    localStorage.setItem('watchedMovies', JSON.stringify(watched))
+  }, [watched])
+
   useEffect(() => {
     if (query.length < 3) {
       setMovies([])
@@ -143,7 +172,6 @@ export default function App() {
         selectedId={selectedId}
         removeSelectedId={removeSelectedId}
         watchedMovies={watched}
-        handleAddWatched={handleAddWatched}
         setWatched={setWatched}
         removeWatchedMovie={removeWatchedMovie}
       />
@@ -214,7 +242,6 @@ function Main({
   selectedId,
   removeSelectedId,
   watchedMovies,
-  handleAddWatched,
   setWatched,
   removeWatchedMovie
 }) {
@@ -231,7 +258,6 @@ function Main({
         selectedId={selectedId}
         removeSelectedId={removeSelectedId}
         watchedMovies={watchedMovies}
-        handleAddWatched={handleAddWatched}
         setWatched={setWatched}
         removeWatchedMovie={removeWatchedMovie}
       />
@@ -283,7 +309,7 @@ function Loader() {
   return <h3 className="text-3xl text-center mt-8">Loading...</h3>
 }
 
-function ListOfMovies({ movies, handleSelectedId, handleAddWatched }) {
+function ListOfMovies({ movies, handleSelectedId }) {
   return (
     <ul className="py-[0.8rem] px-0 list-none overflow-y-auto">
       {movies?.map(movie => (
@@ -327,7 +353,6 @@ function MoviesWatched({
   selectedId,
   removeSelectedId,
   watchedMovies,
-  handleAddWatched,
   setWatched,
   removeWatchedMovie
 }) {
@@ -346,7 +371,6 @@ function MoviesWatched({
         <MovieDetail
           selectedId={selectedId}
           removeSelectedId={removeSelectedId}
-          handleAddWatched={handleAddWatched}
           watched={watchedMovies}
           setWatched={setWatched}
         />
@@ -378,8 +402,6 @@ function MovieDetailsWrapper({ isOpen2, watched, removeWatchedMovie }) {
 }
 // Stateless presentational component | We are using derived state here
 function WatchedSummary({ watched }) {
-  console.log('******* WatchedSummary *********')
-  console.log(watched)
   const avgImdbRating = average(watched.map(movie => Number(movie.imdbRating)))
   const avgUserRating = average(watched.map(movie => Number(movie.userRating)))
   const avgRuntime = average(watched.map(movie => Number(movie.runtime)))
@@ -458,14 +480,7 @@ function WatchedMovie({ movie, removeWatchedMovie }) {
 }
 
 // 3. WatchedMovies also have another toggling component, SelectedMovieDetail
-function MovieDetail({
-  selectedId,
-  removeSelectedId,
-  handleAddWatched,
-  watched,
-  setWatched,
-  removeWatchedMovie
-}) {
+function MovieDetail({ selectedId, removeSelectedId, watched, setWatched, removeWatchedMovie }) {
   const [movieDetail, setMovieDetail] = useState(null)
   const [loading, setLoading] = useState(false)
   let url = `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
@@ -507,7 +522,6 @@ function MovieDetail({
         <MovieDetailInfo
           movie={movieDetail}
           loading={loading}
-          handleAddWatched={handleAddWatched}
           removeSelectedId={removeSelectedId}
           watched={watched}
           setWatched={setWatched}
@@ -519,15 +533,7 @@ function MovieDetail({
   )
 }
 
-function MovieDetailInfo({
-  movie,
-  loading,
-  removeSelectedId,
-  watched,
-  setWatched,
-  selectedId,
-  removeWatchedMovie
-}) {
+function MovieDetailInfo({ movie, loading, removeSelectedId, watched, setWatched, selectedId }) {
   const [userRating, setUserRating] = useState(0)
 
   const {
@@ -571,6 +577,9 @@ function MovieDetailInfo({
       }
 
       const newWatched = [...prevWatched, movie]
+
+      // This can be done in the effect as well
+      // localStorage.setItem('watchedMovies', JSON.stringify(newWatched))
 
       return newWatched
     })
