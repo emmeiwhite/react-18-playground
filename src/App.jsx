@@ -56,11 +56,17 @@ const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
-  const [watched, setWatched] = useState([])
+  // const [watched, setWatched] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [selectedId, setSelectedId] = useState(null)
   const [query, setQuery] = useState('Spirited Away')
+
+  // Other way to set our state directly from the data present in the localStorage
+  const [watched, setWatched] = useState(function () {
+    const storedData = localStorage.getItem('watchedMovies')
+    return JSON.parse(storedData)
+  })
 
   const handleSelectedId = id => {
     // Setting up the id as well as handling up double click when the id is already selected and user clicks on the same id again (i-e., same movie from the left list again)
@@ -447,7 +453,6 @@ function WatchedList({ watched, removeWatchedMovie }) {
 
 // Presentational Component | Stateless
 function WatchedMovie({ movie, removeWatchedMovie }) {
-  console.log(movie)
   return (
     <li
       key={movie.imdbID}
