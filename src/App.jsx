@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Modal from './components/Modal'
 import Success from './components/Success'
 import Failure from './components/Failure'
@@ -219,12 +219,21 @@ function Logo() {
 
 // Stateful Component
 function Search({ query, setQuery }) {
+  const inputElem = useRef(null)
   // useEffect is not a good option to update the DOM directly if required at times.
   // instead we use the hook called useRef.
+  /* ---
   useEffect(() => {
     const el = document.querySelector('.search')
     el.focus()
     el.style.border = '1px solid orange'
+  }, [])
+ --- */
+
+  useEffect(() => {
+    const domInput = inputElem.current
+    domInput.focus()
+    domInput.style.border = '1px solid orange'
   }, [])
   return (
     <input
@@ -233,6 +242,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={e => setQuery(e.target.value)}
+      ref={inputElem}
     />
   )
 }
