@@ -232,8 +232,26 @@ function Search({ query, setQuery }) {
 
   useEffect(() => {
     const domInput = inputElem.current
-    domInput.focus()
-    domInput.style.border = '1px solid orange'
+    function callback(e) {
+      if (e.code === 'Enter') {
+        domInput.focus()
+        domInput.style.border = '1px solid orange'
+
+        if (document.activeElement === inputElem.current) {
+          return
+        }
+        setQuery('')
+      }
+    }
+
+    // Scenario: We want to make sure that when we hit the Enter keypress the search gets focus
+
+    document.addEventListener('keydown', callback)
+
+    // Clean up is important
+    return () => {
+      document.removeEventListener('keydown', callback)
+    }
   }, [])
   return (
     <input
