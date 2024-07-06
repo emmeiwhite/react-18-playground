@@ -219,9 +219,16 @@ function Logo() {
 
 // Stateful Component
 function Search({ query, setQuery }) {
+  // useEffect is not a good option to update the DOM directly if required at times.
+  // instead we use the hook called useRef.
+  useEffect(() => {
+    const el = document.querySelector('.search')
+    el.focus()
+    el.style.border = '1px solid orange'
+  }, [])
   return (
     <input
-      className="justify-self-center border-none px-[1.6rem] py-[1.1rem] text-[1.8rem] rounded-[0.7rem] w-[40rem] transition-all duration-300 text-custom-text bg-primary-light placeholder-custom-text-dark focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:transform focus:-translate-y-0.5"
+      className="justify-self-center border-none px-[1.6rem] py-[1.1rem] text-[1.8rem] rounded-[0.7rem] w-[40rem] transition-all duration-300 text-custom-text bg-primary-light placeholder-custom-text-dark focus:outline-none focus:shadow-[0_2.4rem_2.4rem_rgba(0,0,0,0.1)] focus:transform focus:-translate-y-0.5 search"
       type="text"
       placeholder="Search movies..."
       value={query}
