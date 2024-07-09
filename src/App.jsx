@@ -4,58 +4,58 @@ import Success from './components/Success'
 import Failure from './components/Failure'
 import StarRating from './components/StarRating'
 
-const tempMovieData = [
-  {
-    imdbID: 'tt1375666',
-    Title: 'Inception',
-    Year: '2010',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg'
-  },
-  {
-    imdbID: 'tt0133093',
-    Title: 'The Matrix',
-    Year: '1999',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg'
-  },
-  {
-    imdbID: 'tt6751668',
-    Title: 'Parasite',
-    Year: '2019',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg'
-  }
-]
+// const tempMovieData = [
+//   {
+//     imdbID: 'tt1375666',
+//     Title: 'Inception',
+//     Year: '2010',
+//     Poster:
+//       'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg'
+//   },
+//   {
+//     imdbID: 'tt0133093',
+//     Title: 'The Matrix',
+//     Year: '1999',
+//     Poster:
+//       'https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg'
+//   },
+//   {
+//     imdbID: 'tt6751668',
+//     Title: 'Parasite',
+//     Year: '2019',
+//     Poster:
+//       'https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg'
+//   }
+// ]
 
-const tempWatchedData = [
-  {
-    imdbID: 'tt1375666',
-    Title: 'Inception',
-    Year: '2010',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg',
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10
-  },
-  {
-    imdbID: 'tt0088763',
-    Title: 'Back to the Future',
-    Year: '1985',
-    Poster:
-      'https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg',
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9
-  }
-]
+// const tempWatchedData = [
+//   {
+//     imdbID: 'tt1375666',
+//     Title: 'Inception',
+//     Year: '2010',
+//     Poster:
+//       'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg',
+//     runtime: 148,
+//     imdbRating: 8.8,
+//     userRating: 10
+//   },
+//   {
+//     imdbID: 'tt0088763',
+//     Title: 'Back to the Future',
+//     Year: '1985',
+//     Poster:
+//       'https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg',
+//     runtime: 116,
+//     imdbRating: 8.5,
+//     userRating: 9
+//   }
+// ]
 
 const KEY = '10a55471'
 const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData)
+  const [movies, setMovies] = useState([])
   // const [watched, setWatched] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -446,6 +446,7 @@ function WatchedSummary({ watched }) {
   const avgImdbRating = average(watched.map(movie => Number(movie.imdbRating)))
   const avgUserRating = average(watched.map(movie => Number(movie.userRating)))
   const avgRuntime = average(watched.map(movie => Number(movie.runtime)))
+  console.log(avgRuntime)
   return (
     <div className=" rounded-[0.9rem] shadow-md p-[2.2rem_3.2rem_1.8rem_3.2rem] hover:bg-primary-light hover:text-white cursor-pointer">
       <h2 className="uppercase text-[1.6rem] mb-[0.6rem] ">Movies you watched</h2>
@@ -576,6 +577,8 @@ function MovieDetail({ selectedId, removeSelectedId, watched, setWatched, remove
 function MovieDetailInfo({ movie, loading, removeSelectedId, watched, setWatched, selectedId }) {
   const [userRating, setUserRating] = useState(0)
 
+  console.log('***************')
+  console.log(movie.runtime)
   const {
     Title: title,
     Year: year,
@@ -640,13 +643,14 @@ function MovieDetailInfo({ movie, loading, removeSelectedId, watched, setWatched
   let userRatingOfMovie = watched.find(movie => movie.imdbID === selectedId)
 
   function handleWatchedAddList() {
+    console.log('Checking the runtime:', runtime)
     const movieWatched = {
       imdbID,
       title,
       year,
       poster,
       imdbRating: Number(imdbRating),
-      runtime: runtime.split(' ').at(0),
+      runtime: Number(runtime?.split(' ').at(0) || 0),
       userRating: userRating,
       isWatched: true
     }
